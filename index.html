@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>Normal vs Lego Basemaps</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/dark/main.css"/>
+  <script>
+    var locationPath = window.location.href.replace(/\/[^/]+$/, "/")
+    var dojoConfig = {
+      paths: {
+        layers: locationPath + "src/layers"
+      }
+    };
+  </script>
+  <script src="https://js.arcgis.com/4.15/"></script>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      position: relative;
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+    /* The switch - the box around the slider */
+    .switch {
+      position: absolute;
+      display: inline-block;
+      top: 90px;
+      left: 15px;
+      width: 60px;
+      height: 34px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgb(0, 255, 21);
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="viewDiv">
+  </div>
+
+  <script>
+
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/GroupLayer",
+      "esri/layers/TileLayer",
+      "esri/layers/GeoJSONLayer",
+      "esri/widgets/LayerList",
+      "esri/widgets/Swipe",
+      "esri/widgets/Expand",
+      "layers/BrickLayer",
+      "layers/palette"
+    ],
+    function(
+      Map,
+      MapView,
+      GroupLayer, TileLayer, GeoJSONLayer,
+      LayerList, Swipe, Expand,
+      BrickLayer, palette
+    ) {
+      const map = new Map({
+            // basemap: "satellite"
+          });
+      
+
+      const worldImageLego = new BrickLayer({
+                      layer: new TileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"),
+                      brickSize: 20,
+                      brickStyle: "lego",
+                      visible: true,
+                      title: "World Imagery (LEGO)",
+                      // filter: {
+                      //   darken: 0.25,
+                      //   saturate: 2
+                      // }
+                    });
+                    map.add(worldImageLego);
+
+      const worldImage = new TileLayer({
+                      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+                      maxScale: 3000,
+                      visible: true,
+                      title: "World Imagery"
+                    });
+                    map.add(worldImage);
+
+      const worldStreetLego = new BrickLayer({
+                layer: new TileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"),
+                brickSize: 20,
+                brickStyle: "lego",
+                visible: false,
+                title: "World Street Map (LEGO)",
+                // filter: {
+                //   saturate: 2
+                // }
+              });
+              map.add(worldStreetLego);
+
+      const worldStreet = new TileLayer({
+              url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer",
+              maxScale: 3000,
+              visible: false,
+              title: "World Street Map"
+            });
+            map.add(worldStreet);
+
+      const oceanLego = new BrickLayer({
+          layer: new TileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer"),
+          brickSize: 20,
+          brickStyle: "lego",
+          visible: false,
+          title: "Ocean Basemap (LEGO)",
+          filter: {
+            // darken: 0.25,
+
+          }
+        });
+        map.add(oceanLego);
+
+      const ocean = new TileLayer({
+              url: "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer",
+              maxScale: 3000,
+              visible: false,
+              title: "Ocean Basemap"
+
+            });
+            map.add(ocean);
+
+      const natgeoLego = new BrickLayer({
+          layer: new TileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer"),
+          brickSize: 20,
+          brickStyle: "lego",
+          visible: false,
+          title: "NatGeo World Map (LEGO)",
+          // filter: {
+          //   saturate: 2
+          // }
+        });
+        map.add(natgeoLego);
+
+      const natgeo = new TileLayer({
+              url: "https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer",
+              maxScale: 3000,
+              visible: false,
+              title: "NatGeo World Map"
+            });
+            map.add(natgeo);
+
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [117.537237, -0.578707],
+        // zoom: 9,
+        scale: 14000000,
+        constraints: {
+          minScale: 100000000,
+          snapToZoom: false,
+          // maxZoom: 17,
+          // minZoom: 8
+        }
+      });
+
+
+      // create a layerlist and expand widget and add to the view
+      const layerList = new LayerList({
+        view: view
+      });
+      const llExpand = new Expand({
+        view: view,
+        content: layerList,
+        expanded: false
+      });
+      view.ui.add(llExpand, "top-right");
+
+
+      // create a new Swipe widget
+      const swipe = new Swipe({
+        leadingLayers: [worldStreet, worldImage, ocean, natgeo],
+        trailingLayers: [worldStreetLego, worldImageLego, oceanLego, natgeoLego],
+        direction: "horizontal", // horizontal or vertical
+        position: 50, // set position of widget to 50%
+        view: view
+      });
+
+      // add the widget to the view
+      view.ui.add(swipe);
+
+    });
+
+  </script>
+</body>
+
+</html>
